@@ -1,0 +1,72 @@
+#include <iostream>
+#include<limits.h>
+using namespace std;
+
+class bst
+{
+public:
+    bst *left;
+    bst *right;
+    int data;
+    bst(int data)
+    {
+        this->data = data;
+        left = NULL;
+        right = NULL;
+    }
+};
+bst *insertinto_bst(bst *&root, int data) // log(n)
+{
+    if (root == NULL)
+    {
+        root = new bst(data);
+        return root; // the whole tree is empty (first insertion) OR you reached an empty child spot where the new bst should go
+    }
+    if (data > root->data)
+    {
+        root->right = insertinto_bst(root->right, data);
+    }
+    if (data < root->data)
+    {
+        root->left = insertinto_bst(root->left, data);
+    }
+    return root;
+}
+
+void take_input(bst *&root)
+{
+    int data;
+    cin >> data;
+    while (data != -1)
+    {
+        insertinto_bst(root, data);
+        cin >> data;
+    }
+}
+
+
+bool is_bst(bst *root, int min, int max)
+{
+    if (root == NULL)
+    {
+        return true;
+    }
+    if (root->data >= min && root->data <= max)
+    {
+        bool left = is_bst(root->left, min, root->data);
+        bool right = is_bst(root->right, root->data, max);
+        return left && right;
+    }
+    else 
+    return false;
+}
+int main()
+{
+    bst* root=NULL; 
+    take_input(root);
+    if (is_bst(root, INT_MIN, INT_MAX))
+        cout << "The tree is a BST";
+    else
+        cout << "The tree is NOT a BST";
+        return 0 ;
+}
