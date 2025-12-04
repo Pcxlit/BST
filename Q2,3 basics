@@ -1,0 +1,168 @@
+#include <iostream>
+#include <queue>
+#include <math.h>
+using namespace std;
+class bst
+{
+public:
+    bst *left;
+    bst *right;
+    int data;
+    bst(int data)
+    {
+        this->data = data;
+        left = NULL;
+        right = NULL;
+    } // typedef struct bst bst ; bst* root=NULL
+};
+int minVal(bst *root)
+{
+    while (root->left != NULL)
+    {
+        root = root->left;
+    }
+    return root->data;
+}
+bst *insertinto_bst(bst *&root, int data) // log(n)
+{
+    if (root == NULL)
+    {
+        root = new bst(data);
+        return root; // the whole tree is empty (first insertion) OR you reached an empty child spot where the new bst should go
+    }
+    if (data > root->data)
+    {
+        root->right = insertinto_bst(root->right, data);
+    }
+    if (data < root->data)
+    {
+        root->left = insertinto_bst(root->left, data);
+    }
+    return root;
+}
+
+void take_input(bst *&root)
+{
+    int data;
+    cin >> data;
+    while (data != -1)
+    {
+        insertinto_bst(root, data);
+        cin >> data;
+    }
+}
+
+void levelordertransvrsal(bst *root) // inorder of bst is sorted
+{                                    // print the tree
+    queue<bst *> q;                  // That stores pointers to BST nodes
+    q.push(root);
+    q.push(NULL);
+    while (!q.empty())
+    {
+        bst *temp = q.front(); // pointer pointing towards front of queue
+
+        if (temp == NULL) // seperate levels
+        {
+            cout << endl;
+            q.pop();
+            if (!q.empty())
+            {
+                q.push(NULL);
+            }
+        }
+        else
+        {
+            cout << temp->data << " ";
+            q.pop();
+
+            if (temp->left) // push lower order elements in queue so that they can be printed
+            {
+                q.push(temp->left);
+            }
+
+            if (temp->right)
+            {
+                q.push(temp->right);
+            }
+        }
+    }
+}
+bool search_bst(bst *&root, int data) // log(n)
+{
+    if (root == NULL)
+        return false;
+    if (data == root->data)
+    {
+        cout << "yes data is present" << endl;
+        return true;
+    }
+    if (data > root->data)
+    {
+        return search_bst(root->right, data);
+    }
+    if (data < root->data)
+    {
+        return search_bst(root->left, data);
+    }
+    return false;
+}
+bst *delete_node(bst *root, int data) // o(n)
+{
+    if (root == NULL)
+    {
+        cout << "tree is empty" << endl;
+        return root;
+    }
+    if (data == root->data)
+    {
+        if (root->left == NULL && root->right == NULL)
+        {
+            delete root;
+            return NULL;
+        }
+        if (root->left == NULL && root->right != NULL)
+        {
+            bst *temp = root->right;
+            delete root;
+            return temp;
+        }
+        if (root->left != NULL && root->right == NULL)
+        {
+            bst *temp = root->left;
+            delete root;
+            return temp;
+        }
+        if (root->left != NULL && root->right != NULL)
+        {
+            // left se max ya phir  right se min
+            int mini = minVal(root->right);
+            root->data = mini;
+            root->right = delete_node(root->right, mini);
+            return root;
+        }
+    }
+    else if (data > root->data)
+    {
+        root->right = delete_node(root->right, data);
+        return root;
+    }
+    else if (data < root->data)
+    {
+        root->left = delete_node(root->left, data);
+        return root;
+    }
+    else
+    {
+        cout << "data not available" << endl;
+        return root;
+    }
+}
+int main()
+{
+    bst *root = NULL;
+    cout << "enter data for bst" << endl;
+    take_input(root);
+    levelordertransvrsal(root);
+    root=delete_node(root,30);
+    return 0;
+}
